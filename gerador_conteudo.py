@@ -20,18 +20,18 @@ class PostInstagram(BaseModel):
     )
     carousel_cards: List[str] = Field(
         ...,
-        description="Textos que irão em cada card do carrossel (máximo de 5 cards). Cada item representa um slide/card. O primeiro slide deve ser um hook irresistível. O último slide deve conter a CTA para curtir, comentar, compartilhar ou seguir o perfil @djangiota."
+        description="Textos que irão em cada card do carrossel (de 5 até 15 cards). Cada item representa um slide/card. O primeiro slide deve ser um hook irresistível. O último slide deve conter a CTA para curtir, comentar, compartilhar ou seguir o perfil @djangiota."
     )
     caption: str = Field(
         ...,
-        description="Legenda altamente engajadora para o feed. Deve conter introdução cativante, desenvolvimento sucinto e CTA clara + hashtags estratégicas."
+        description="Legenda altamente engajadora para o feed. Deve conter introdução cativante, desenvolvimento sucinto, CTA clara e exatamente 5 hashtags estratégicas."
     )
 
     @field_validator('carousel_cards')
     @classmethod
     def validate_carousel_cards(cls, v: List[str]) -> List[str]:
-        if not (1 <= len(v) <= 5):
-            raise ValueError("O carrossel precisa ter entre 1 e 5 cards.")
+        if not (5 <= len(v) <= 20):
+            raise ValueError("O carrossel precisa ter entre 5 e 20 cards.")
         return v
 
 def gerar_post_ia(tema: str) -> PostInstagram:
@@ -56,15 +56,16 @@ def gerar_post_ia(tema: str) -> PostInstagram:
         "5. IMPORTANTE: Use obrigatoriamente quebras de linha (\\n) para separar elementos de texto dentro de cada card (como o título do card, explicações secundárias, itens de lista e blocos de código). O código Python dentro dos blocos ```python ... ``` deve conter quebras de linha reais e recuos adequados (4 espaços) para cada instrução. Nunca retorne o código ou o texto de um card em uma única linha contínua.\n\n"
         "DIRETRIZES DA ESTRUTURA (Retorne EXATAMENTE os campos solicitados no schema):\n"
         "- title: Um título curto que represente o post de forma organizada.\n"
-        "- carousel_cards (Máximo 5 cards):\n"
+        "- carousel_cards (Dinâmico: de 5 até 15 cards dependendo da complexidade do tema):\n"
+        "  * Avalie a complexidade do tema fornecido: se for simples ou direto, gere de 5 a 6 cards. Se for um guia aprofundado, arquitetura complexa ou tutorial passo a passo denso, expanda a explicação técnica gerando mais cards intermediários (entre 8 e 12 cards, com limite máximo de 15 cards).\n"
         "  * Card 1: Hook (Gancho) - Um título chamativo e um subtítulo instigante (use quebra de linha entre eles).\n"
-        "  * Cards 2, 3 e 4: O núcleo técnico. Explicações curtas ou códigos práticos ilustrativos (use quebras de linha para formatar).\n"
-        "  * Card 5: Chamada para Ação (CTA) - Incentive o usuário a interagir, curtir, comentar sua opinião e seguir o perfil @djangiota (use quebras de linha).\n"
+        "  * Cards intermediários (do Card 2 até o penúltimo card): O núcleo técnico. Explicações curtas progressivas, conceitos chave ou códigos práticos ilustrativos (use quebras de linha para formatar).\n"
+        "  * Card Final: Chamada para Ação (CTA) - Incentive o usuário a interagir, curtir, comentar sua opinião e seguir o perfil @djangiota (use quebras de linha).\n"
         "- caption:\n"
         "  * Legenda completa e formatada com quebras de linha para o feed do Instagram.\n"
         "  * Comece com um gancho em texto.\n"
         "  * Explique resumidamente o aprendizado.\n"
-        "  * Termine com CTA e hashtags relevantes para o nicho (ex: #python #django #fastapi #backend #dataengineering #djangiota)."
+        "  * Termine com CTA e obrigatoriamente exatamente 5 hashtags relevantes para o nicho (ex: #python #django #fastapi #backend #djangiota)."
     )
 
     prompt = f"Crie um post completo para o Instagram sobre o seguinte tema técnico: '{tema}'"

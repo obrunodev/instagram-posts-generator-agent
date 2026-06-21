@@ -5,6 +5,7 @@ import argparse
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from playwright.sync_api import sync_playwright
+import pyperclip
 
 import config
 import db
@@ -152,7 +153,11 @@ def gerar_imagens_post(post_id: int) -> bool:
         
     total_cards = len(processed_cards)
     
-    # 3. Compila o template com Jinja2
+    # 3. Prepara o diretório de destino
+    output_dir = config.BASE_DIR / "posts_gerados" / f"post_{post_id}"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # 4. Compila o template com Jinja2 e salva como preview.html no diretório de destino
     template_dir = config.BASE_DIR / "templates"
     env = Environment(loader=FileSystemLoader(str(template_dir)))
     try:
@@ -167,15 +172,24 @@ def gerar_imagens_post(post_id: int) -> bool:
         total_cards=total_cards
     )
     
-    # Grava um HTML temporário para navegação do Playwright
-    temp_html_path = config.BASE_DIR / f"temp_post_{post_id}.html"
-    with open(temp_html_path, "w", encoding="utf-8") as f:
+    preview_html_path = output_dir / "preview.html"
+    with open(preview_html_path, "w", encoding="utf-8") as f:
         f.write(html_output)
+    print(f"🖥️ Visualização HTML salva em: {preview_html_path.relative_to(config.BASE_DIR)}")
+
+    # 5. Salva a legenda em um arquivo .txt
+    legenda_path = output_dir / "legenda.txt"
+    with open(legenda_path, "w", encoding="utf-8") as f:
+        f.write(post["caption"])
+    print(f"📝 Legenda salva em: {legenda_path.relative_to(config.BASE_DIR)}")
+
+    # 6. Copia a legenda para a área de transferência (clipboard)
+    try:
+        pyperclip.copy(post["caption"])
+        print("📋 Legenda copiada automaticamente para a área de transferência!")
+    except Exception as e:
+        print(f"⚠️ Não foi possível copiar a legenda para o clipboard: {e}")
         
-    # 4. Prepara o diretório de destino das imagens
-    output_dir = config.BASE_DIR / "posts_gerados" / f"post_{post_id}"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
     print(f"📸 Iniciando o motor do Playwright em modo headless...")
     try:
         with sync_playwright() as p:
@@ -183,7 +197,7 @@ def gerar_imagens_post(post_id: int) -> bool:
             page = browser.new_page()
             
             # Carrega o arquivo HTML local
-            page.goto(temp_html_path.as_uri())
+            page.goto(preview_html_path.as_uri())
             
             # Aguarda as fontes carregarem corretamente
             page.wait_for_timeout(1000)
@@ -212,15 +226,21 @@ def gerar_imagens_post(post_id: int) -> bool:
         db.atualizar_status(post_id, "Pronto para Imagem")
         print(f"\n✅ Imagens geradas com sucesso no diretório: {output_dir.relative_to(config.BASE_DIR)}")
         print(f"🗃️ Status do post ID {post_id} atualizado para 'Pronto para Imagem'.")
+
+        # 7. Abre a pasta gerada automaticamente no Windows
+        if os.name == "nt":
+            try:
+                os.startfile(output_dir)
+                print("📂 Pasta do post aberta automaticamente no Explorador de Arquivos.")
+            except Exception as e:
+                print(f"⚠️ Não foi possível abrir a pasta automaticamente: {e}")
+                
         return True
         
     except Exception as e:
         print(f"❌ Falha ao processar capturas no Playwright: {e}", file=sys.stderr)
         return False
-    finally:
-        # Remove arquivo temporário de HTML
-        if temp_html_path.exists():
-            temp_html_path.unlink()
+
 
 def main():
     parser = argparse.ArgumentParser(

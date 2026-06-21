@@ -98,7 +98,7 @@ uv run gerador_conteudo.py -u <ID_DO_POST> "Postado"
 ```
 *(Status válidos: `Rascunho`, `Pronto para Imagem` e `Postado`)*
 
-### 4. Geração Visual das Imagens
+### 4. Geração Visual das Imagens e Preparação Manual
 Para renderizar e exportar o HTML como imagens de alta definição PNG (no formato 1080x1350px recomendado pelo Instagram) do post mais recente criado:
 ```bash
 uv run gerador_design.py
@@ -107,7 +107,14 @@ Caso queira gerar as imagens para um ID de post específico do banco de dados:
 ```bash
 uv run gerador_design.py <ID_DO_POST>
 ```
-As imagens serão salvas em uma pasta correspondente em `posts_gerados/post_<ID>/*.png`. Além disso, o script atualiza automaticamente o status do post para `Pronto para Imagem` no banco de dados local.
+
+Ao executar o script de design, o agente simplifica ao máximo a postagem manual realizando o seguinte fluxo automaticamente:
+1. **Geração de Imagens**: Salva os cards em ordem numérica (`card_1.png` a `card_5.png`) na pasta `posts_gerados/post_<ID>`.
+2. **Visualização Rápida (`preview.html`)**: Salva um arquivo HTML estático na pasta do post para que você possa visualizar o carrossel completo de uma vez no seu navegador.
+3. **Arquivo de Legenda (`legenda.txt`)**: Salva a legenda gerada pela IA e as hashtags em um arquivo de texto limpo para fácil consulta.
+4. **Cópia para a Área de Transferência**: Copia automaticamente a legenda gerada para a área de transferência do seu sistema. Ao abrir o Instagram, basta dar `Ctrl + V` no campo de texto da legenda!
+5. **Abertura Automática da Pasta**: No Windows, abre automaticamente o Explorador de Arquivos diretamente na pasta do post para facilitar o envio das imagens.
+
 
 ---
 
