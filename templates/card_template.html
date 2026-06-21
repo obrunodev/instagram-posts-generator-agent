@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #030712;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #f3f4f6;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Contenedor que agrupa todos os cards para visualização fácil no navegador */
+        .carousel-container {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            padding: 50px;
+            background-color: #030712;
+        }
+        /* Dimensões exatas solicitadas: 1080px de largura por 1350px de altura */
+        .card {
+            width: 1080px;
+            height: 1350px;
+            position: relative;
+            background: radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 95px 80px;
+            overflow: hidden;
+            border: 1px solid #1f2937;
+        }
+        
+        /* Efeito de brilho neon decorativo no fundo de cada tipo de card */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            left: -150px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .card.card-first::before {
+            background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        .card.card-last::before {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+            top: auto;
+            left: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .brand {
+            font-size: 26px;
+            font-weight: 800;
+            color: #3b82f6;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+        .brand span {
+            color: #f3f4f6;
+        }
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+        .dot.red { background-color: #ef4444; }
+        .dot.yellow { background-color: #f59e0b; }
+        .dot.green { background-color: #10b981; }
+        
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 10;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        
+        /* Card de Capa (Primeiro Slide) */
+        .card-first .post-title {
+            font-size: 68px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 30px;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .card-first .post-subtitle {
+            font-size: 32px;
+            color: #9ca3af;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        .card-first .post-subtitle strong {
+            color: #f3f4f6;
+        }
+
+        /* Card Normal e Último */
+        .card-title {
+            font-size: 44px;
+            font-weight: 800;
+            color: #3b82f6;
+            margin-bottom: 35px;
+            line-height: 1.3;
+            letter-spacing: -0.8px;
+        }
+        
+        .card-text {
+            font-size: 28px;
+            line-height: 1.65;
+            color: #cbd5e1;
+            font-weight: 400;
+        }
+        
+        .card-text p {
+            margin-bottom: 22px;
+        }
+        
+        .card-text strong {
+            color: #f3f4f6;
+            font-weight: 600;
+        }
+        
+        /* Listas no Card */
+        .card-text ul {
+            margin-left: 28px;
+            margin-bottom: 22px;
+        }
+        
+        .card-text li {
+            margin-bottom: 12px;
+            list-style-type: square;
+            color: #cbd5e1;
+        }
+        
+        .card-text li strong {
+            color: #3b82f6;
+        }
+
+        /* Bloco de Código Terminal */
+        .terminal {
+            background-color: #0b0f17;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 24px;
+            font-family: 'Fira Code', monospace;
+            font-size: 20px;
+            line-height: 1.55;
+            color: #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #4b5563;
+        }
+        
+        .terminal-file {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        
+        .terminal-lang {
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Estilização das classes de código */
+        .code-keyword { color: #f472b6; font-weight: bold; }      /* def, import, return */
+        .code-builtin { color: #60a5fa; }      /* print, len */
+        .code-string { color: #34d399; }       /* strings */
+        .code-comment { color: #6b7280; font-style: italic; } /* comentários */
+        .code-decorator { color: #fbbf24; }    /* decoradores */
+
+        /* Card de Fechamento (Último Slide) */
+        .card-last .cta-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .card-last .cta-title {
+            font-size: 58px;
+            font-weight: 800;
+            color: #10b981;
+            line-height: 1.2;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
+        }
+        
+        .cta-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 28px;
+            color: #d1d5db;
+            line-height: 1.5;
+        }
+        
+        .cta-icon {
+            font-size: 36px;
+            color: #10b981;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .cta-item strong {
+            color: #10b981;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #1f2937;
+            padding-top: 25px;
+            z-index: 10;
+        }
+        
+        .profile {
+            font-size: 24px;
+            font-weight: 800;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .profile .at {
+            color: #3b82f6;
+        }
+        
+        .slide-indicator {
+            font-size: 20px;
+            font-weight: 700;
+            color: #94a3b8;
+            background-color: #1e293b;
+            padding: 8px 18px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        {% for card in cards %}
+        {% set card_index = loop.index %}
+        
+        {# Define a classe do card com base na posição #}
+        {% if loop.first %}
+            {% set card_class = "card card-first" %}
+        {% elif loop.last %}
+            {% set card_class = "card card-last" %}
+        {% else %}
+            {% set card_class = "card" %}
+        {% endif %}
+        
+        <div class="{{ card_class }}" id="card-{{ card_index }}">
+            <!-- Header -->
+            <div class="header">
+                <div class="brand">
+                    <div class="brand-dot"></div>
+                    <span>djangiota</span>
+                </div>
+                <div class="window-controls">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+            </div>
+            
+            <!-- Conteúdo Principal -->
+            <div class="main-content">
+                {% if loop.first %}
+                    <!-- Capa -->
+                    <div class="post-title">{{ post_title }}</div>
+                    <div class="post-subtitle">{{ card.html_content | safe }}</div>
+                {% elif loop.last %}
+                    <!-- CTA Final -->
+                    <div class="cta-container">
+                        <div class="cta-title">Curtiu esse hack?</div>
+                        <div class="cta-item">
+                            <span class="cta-icon">💬</span>
+                            <span>Deixe sua opinião nos comentários!</span>
+                        </div>
+                        <div class="cta-item">
+                            <span class="cta-icon">🚀</span>
+                            <span>Compartilhe com a sua rede!</span>
+                        </div>
+                        <div class="cta-item">
+                            <span class="cta-icon">📌</span>
+                            <span>Salve este post para consultar depois!</span>
+                        </div>
+                        <div class="cta-item">
+                            <span class="cta-icon">🔔</span>
+                            <span>Siga <strong>@djangiota</strong> para dominar Python e Backend.</span>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Slides de Conteúdo -->
+                    {% if card.card_title %}
+                        <div class="card-title">{{ card.card_title }}</div>
+                    {% endif %}
+                    
+                    <div class="card-text">
+                        {{ card.html_content | safe }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Rodapé -->
+            <div class="footer">
+                <div class="profile">
+                    <span class="at">@</span>djangiota
+                </div>
+                <div class="slide-indicator">
+                    {{ card_index }}/{{ total_cards }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
