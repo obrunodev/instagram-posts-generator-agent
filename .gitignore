@@ -11,5 +11,7 @@ wheels/
 
 # App-specific generated files & configs
 .env
-posts.db
-posts_gerados/
+data/posts.db
+data/generated/
+data/temp_audio/
+

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilos para renderização de página (PDF) */
+        @page {
+            size: A4;
+            margin-top: 25mm;
+            margin-bottom: 25mm;
+            margin-left: 25mm;
+            margin-right: 25mm;
+        }
+
+        /* Oculta cabeçalhos e rodapés na capa usando margem 0 */
+        @page :first {
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #334155; /* Slate 700 para leitura confortável */
+            background-color: #ffffff;
+            line-height: 1.8; /* Espaçamento confortável de leitura */
+            font-size: 20px;  /* Aumentado significativamente para leitura confortável em telas e celulares */
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Estilo da Capa (Cover Page) */
+        .cover {
+            page-break-after: always;
+            height: 100vh; /* Ocupa 100% da altura da página A4 */
+            width: 100%;   /* Ocupa 100% da largura da página A4 */
+            padding: 45mm 25mm 25mm 25mm;
+            background: radial-gradient(circle at 10% 20%, #ffffff 0%, #f8fafc 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .cover-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #3b82f6 0%, #a855f7 100%);
+        }
+
+        .cover-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 22px; /* Aumentado */
+            color: #3b82f6;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-header span {
+            color: #0f172a;
+        }
+
+        .cover-brand-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .cover-body {
+            margin-bottom: auto;
+            margin-top: auto;
+        }
+
+        .cover-title {
+            font-size: 48px; /* Aumentado */
+            font-weight: 800;
+            line-height: 1.25;
+            color: #0f172a;
+            margin-bottom: 25px;
+            letter-spacing: -1.5px;
+        }
+
+        .cover-subtitle {
+            font-size: 24px; /* Aumentado */
+            color: #475569;
+            font-weight: 400;
+            line-height: 1.6;
+            border-left: 4px solid #3b82f6;
+            padding-left: 20px;
+        }
+
+        .cover-footer {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px; /* Aumentado */
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        /* Estilos do Conteúdo */
+        .content-container {
+            padding: 0 5mm;
+        }
+
+        /* Forçar quebras de página nos capítulos principais */
+        h2 {
+            page-break-before: always;
+            font-size: 32px; /* Aumentado de 26px para visual robusto */
+            font-weight: 800;
+            color: #0f172a;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 10px;
+            margin-top: 45px;
+            margin-bottom: 25px;
+            letter-spacing: -0.8px;
+        }
+
+        /* Evitar quebra órfã de títulos */
+        h1, h2, h3, h4, h5, h6 {
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-size: 26px; /* Aumentado de 21px */
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        h4 {
+            font-size: 22px; /* Aumentado de 18px */
+            font-weight: 700;
+            color: #334155;
+            margin-top: 26px;
+            margin-bottom: 12px;
+        }
+
+        h5 {
+            font-size: 18px; /* Aumentado de 16px */
+            font-weight: 700;
+            color: #475569;
+            margin-top: 22px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        p strong, li strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        ul, ol {
+            margin-left: 28px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        li::marker {
+            color: #3b82f6;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e2e8f0;
+            margin: 35px 0;
+        }
+
+        a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Estilo de Código Inline (ex: `git add .`) */
+        .inline-code {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88em;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Bloco de Código Terminal Escuro */
+        .terminal {
+            background-color: #0b0f17;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px; /* Aumentado de 14px para leitura confortável de código */
+            line-height: 1.65;
+            color: #e2e8f0;
+            margin: 26px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            page-break-inside: avoid; /* Evita quebra de página no meio do código */
+        }
+
+        .terminal pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        .terminal-file {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .terminal-lang {
+            font-weight: 600;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .code-keyword { color: #f472b6; font-weight: bold; }      /* def, class, return */
+        .code-builtin { color: #60a5fa; }      /* print, len */
+        .code-string { color: #34d399; }       /* strings */
+        .code-comment { color: #6b7280; font-style: italic; } /* comentários */
+        .code-decorator { color: #fbbf24; }    /* decoradores */
+
+        /* Blocos de Alerta / Callout */
+        .alert {
+            padding: 18px 22px;
+            border-radius: 8px;
+            margin: 26px 0;
+            font-size: 18px; /* Aumentado de 16px */
+            line-height: 1.65;
+            page-break-inside: avoid;
+        }
+
+        .alert strong {
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .alert-note {
+            background-color: #f8fafc;
+            border-left: 4px solid #64748b;
+            color: #334155;
+        }
+        
+        .alert-tip {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-important {
+            background-color: #faf5ff;
+            border-left: 4px solid #a855f7;
+            color: #581c87;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border-left: 4px solid #fb5f07;
+            color: #7c2d12;
+        }
+
+        .alert-caution {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+
+        blockquote {
+            border-left: 4px solid #cbd5e1;
+            padding-left: 18px;
+            margin: 24px 0;
+            font-style: italic;
+            color: #475569;
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+    <!-- Capa A4 -->
+    <div class="cover">
+        <div class="cover-accent"></div>
+        <div class="cover-header">
+            <div class="cover-brand-dot"></div>
+            <span>brunopythonista</span>
+        </div>
+        <div class="cover-body">
+            <div class="cover-title">{{ title }}</div>
+            <div class="cover-subtitle">{{ subtitle }}</div>
+        </div>
+        <div class="cover-footer">
+            <span>E-BOOK DIDÁTICO</span>
+            <span>@brunopythonista</span>
+        </div>
+    </div>
+
+    <!-- Conteúdo do Livro -->
+    <div class="content-container">
+        {{ content | safe }}
+    </div>
+</body>
+</html>

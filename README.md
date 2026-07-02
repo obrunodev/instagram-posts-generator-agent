@@ -1,133 +1,93 @@
-# 🤖 Agente de Geração de Conteúdo e Design para Instagram (@djangiota)
+# 🤖 Agente Brunopythonista - Repositório Multi-Ferramentas de Automação e IA
 
-Este é um projeto automatizado desenvolvido em **Python** para criar posts do tipo carrossel para o perfil do Instagram **@djangiota**. O agente utiliza a inteligência artificial do **Gemini 2.5 Flash** para gerar conteúdos técnicos e educativos focados no ecossistema Python (Django, FastAPI, Backend e Engenharia de Dados) e renderiza slides visuais de alta definição (1080x1350px) em um estilo dark moderno de terminal utilizando **Playwright** e **Jinja2**.
+Este repositório contém uma suite unificada de ferramentas de automação e agentes baseados em Inteligência Artificial para otimizar processos de criação de conteúdo e estudos do perfil **@brunopythonista**. O projeto é desenvolvido em **Python** e utiliza a API do **Gemini 2.5 Flash** (via SDK oficial `google-genai`).
 
 ---
 
-## 🗺️ Fluxo de Funcionamento
+## 📂 Estrutura Geral do Projeto
 
-O sistema opera de forma modular dividida em etapas integradas locais:
+O repositório é organizado de forma modular para que novas ferramentas e integradores possam ser adicionados facilmente:
 
-```mermaid
-graph TD
-    A[Tema Técnico / Prompt] --> B(gerador_conteudo.py)
-    B -->|Gemini 2.5 Flash - Structured Outputs| C{JSON estruturado}
-    C -->|Salva post como Rascunho| D[(posts.db - SQLite)]
-    D --> E(gerador_design.py)
-    E -->|Lê dados do banco| F[Jinja2 + HTML Template]
-    F -->|Renderiza HTML no browser virtual| G(Playwright Headless)
-    G -->|Gera PNGs 1080x1350px| H[posts_gerados/post_ID/*.png]
-    G -->|Atualiza status para 'Pronto para Imagem'| D
+```text
+instagram-posts-generator-agent/
+├── pyproject.toml                     # Dependências do projeto e scripts CLI
+├── README.md                          # Visão geral do repositório (este arquivo)
+├── .env                               # Configurações confidenciais locais
+│
+├── src/                               # Código-fonte principal
+│   ├── cli.py                         # Ponto de entrada (CLI central)
+│   ├── core/                          # Recursos e configurações compartilhados
+│   └── tools/                         # Ferramentas independentes (Módulos)
+│       ├── instagram/                 # Agente do Instagram (Posts e Imagens)
+│       └── youtube_to_obsidian/       # Transcritor e Resumos do YouTube para o Obsidian
+│
+└── data/                              # Banco de dados e mídias geradas localmente
+    ├── posts.db                       # Banco SQLite unificado
+    └── generated/                     # Mídias e artefatos de saída
 ```
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🗺️ Ferramentas e Documentações Específicas
 
-- **Gerenciador de Dependências**: [uv](https://github.com/astral-sh/uv) (gerenciamento rápido de pacotes e ambientes virtuais).
-- **Motor de Inteligência Artificial**: `google-genai` SDK (`gemini-2.5-flash`) com **Structured Outputs** (Pydantic schemas) para consistência no formato retornado.
-- **Banco de Dados**: SQLite para persistência simples do histórico de posts e seus respectivos status (`Rascunho`, `Pronto para Imagem`, `Postado`).
-- **Motor de Design**: [Playwright](https://playwright.dev/python/) para captura e exportação de elementos HTML como imagens e Jinja2 para a compilação do template dinâmico [card_template.html](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/templates/card_template.html).
+Para entender os detalhes de funcionamento, fluxos de escopo e comandos CLI de cada ferramenta, consulte suas respectivas documentações:
 
----
+### 📸 1. Instagram Post Generator
+Agente de geração de posts carrosséis técnicos (Python, Django, FastAPI) com motor de captura de imagens em terminal dark mode usando Playwright.
+*   👉 **[Documentação do Módulo Instagram](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/tools/instagram/README.md)**
+*   📋 **[Escopo do Módulo Instagram](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/tools/instagram/escopo_agente_instagram.md)**
 
-## 📂 Estrutura do Projeto
-
-*   [gerador_conteudo.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/gerador_conteudo.py): Script CLI principal para geração de conteúdos técnicos textuais por meio da API do Gemini, listagem de posts salvos e atualização de status.
-*   [gerador_design.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/gerador_design.py): Módulo responsável pelo motor de design, aplicando parse do texto (como detecção de blocos de código e negrito) e gerando as imagens PNG finais a partir do template HTML.
-*   [db.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/db.py): Gerenciamento da conexão com o banco SQLite local (`posts.db`), inicialização das tabelas e transações.
-*   [config.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/config.py): Configuração do ambiente e validação das variáveis do `.env`.
-*   [templates/card_template.html](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/templates/card_template.html): Template Jinja2 estruturado em HTML/CSS para os slides do carrossel (estilo Dark Theme/Terminal com fontes customizadas *Plus Jakarta Sans* e *Fira Code*).
-*   [escopo_agente_instagram.md](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/escopo_agente_instagram.md): Escopo e planejamento das fases de desenvolvimento do agente.
+### 🎥 2. YouTube to Obsidian Transcriber
+Transcritor de vídeos e gerador de notas e resumos didáticos estruturados em Markdown integrado diretamente ao seu vault de estudos local.
+*   👉 **[Documentação do Módulo YouTube/Obsidian](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/tools/youtube_to_obsidian/README.md)**
+*   📋 **[Escopo do Módulo YouTube/Obsidian](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/tools/youtube_to_obsidian/escopo_youtube_to_obsidian.md)**
 
 ---
 
-## 🚀 Instalação e Configuração
+## 🚀 Instalação e Setup Global
 
-### 1. Pré-requisitos
-Certifique-se de possuir o gerenciador `uv` instalado em sua máquina. Caso não tenha, siga as instruções oficiais ou utilize:
+### 1. Instalar Gerenciador `uv`
+Certifique-se de ter o gerenciador de pacotes `uv` instalado em sua máquina:
 ```bash
 # Windows (PowerShell)
 irm https://astral.sh/uv/install.ps1 | iex
 ```
 
 ### 2. Configurar o Ambiente Virtual e Dependências
-Execute os comandos abaixo na raiz do projeto para criar o ambiente virtual e instalar todas as dependências declaradas no [pyproject.toml](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/pyproject.toml):
+Execute a sincronização do ambiente virtual a partir da raiz do projeto:
 ```bash
 uv sync
 ```
 
-### 3. Instalar o Browser do Playwright
-Para habilitar a captura e geração das imagens via Playwright, instale o Chromium headless:
+### 3. Instalar Dependências Externas (Browser Playwright)
+Instale o browser Chromium headless para habilitar o gerador de imagens do Instagram:
 ```bash
 uv run playwright install chromium
 ```
 
-### 4. Configurar as Variáveis de Ambiente
-Copie o arquivo `.env.example` para `.env` e preencha as variáveis de ambiente necessárias:
-```bash
-cp .env.example .env
-```
-No arquivo `.env`, adicione a sua chave de API do Gemini:
+### 4. Configurar Variáveis no `.env`
+Crie ou edite o arquivo `.env` na raiz do projeto contendo as seguintes configurações:
 ```env
-GEMINI_API_KEY=sua_chave_de_api_do_google_ai_studio
+# Chave de API do Google AI Studio (Gemini)
+GEMINI_API_KEY=sua_chave_de_api_aqui
+
+# Caminho absoluto da pasta do seu Vault do Obsidian (necessário apenas para a ferramenta youtube)
+OBSIDIAN_VAULT_PATH=C:/Users/seu_usuario/Documents/Obsidian/SeuVault
 ```
 
 ---
 
-## 🕹️ Guia de Uso
+## 🕹️ Roteamento de Comandos CLI
 
-### 1. Geração de Conteúdo Técnico
-Para gerar um post do zero e salvá-lo no banco de dados local com o status `Rascunho`, execute o script [gerador_conteudo.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/gerador_conteudo.py) passando o tema técnico desejado como argumento:
+A partir de agora, todas as ferramentas podem ser chamadas a partir da CLI unificada usando o formato `uv run python -m src.cli [ferramenta] [ação]`:
+
 ```bash
-uv run gerador_conteudo.py "Boas Práticas de prefetch_related no Django ORM"
+# Instagram: Gerar Conteúdo
+uv run python -m src.cli instagram generate "Tema do Post"
+
+# Instagram: Renderizar Design dos Slides
+uv run python -m src.cli instagram design [ID_DO_POST]
+
+# YouTube/Obsidian: Transcrever e Resumir Vídeo
+uv run python -m src.cli youtube process --url "URL_DO_VIDEO"
 ```
-
-### 2. Listagem de Posts Gerados
-Para visualizar a tabela com o histórico de posts salvos localmente:
-```bash
-uv run gerador_conteudo.py -l
-# ou
-uv run gerador_conteudo.py --list
-```
-
-### 3. Alteração Manual de Status
-Caso precise ajustar manualmente o status de um post (por exemplo, após postar no Instagram):
-```bash
-uv run gerador_conteudo.py -u <ID_DO_POST> "Postado"
-```
-*(Status válidos: `Rascunho`, `Pronto para Imagem` e `Postado`)*
-
-### 4. Geração Visual das Imagens e Preparação Manual
-Para renderizar e exportar o HTML como imagens de alta definição PNG (no formato 1080x1350px recomendado pelo Instagram) do post mais recente criado:
-```bash
-uv run gerador_design.py
-```
-Caso queira gerar as imagens para um ID de post específico do banco de dados:
-```bash
-uv run gerador_design.py <ID_DO_POST>
-```
-
-Ao executar o script de design, o agente simplifica ao máximo a postagem manual realizando o seguinte fluxo automaticamente:
-1. **Geração de Imagens**: Salva os cards em ordem numérica (`card_1.png` a `card_5.png`) na pasta `posts_gerados/post_<ID>`.
-2. **Visualização Rápida (`preview.html`)**: Salva um arquivo HTML estático na pasta do post para que você possa visualizar o carrossel completo de uma vez no seu navegador.
-3. **Arquivo de Legenda (`legenda.txt`)**: Salva a legenda gerada pela IA e as hashtags em um arquivo de texto limpo para fácil consulta.
-4. **Cópia para a Área de Transferência**: Copia automaticamente a legenda gerada para a área de transferência do seu sistema. Ao abrir o Instagram, basta dar `Ctrl + V` no campo de texto da legenda!
-5. **Abertura Automática da Pasta**: No Windows, abre automaticamente o Explorador de Arquivos diretamente na pasta do post para facilitar o envio das imagens.
-
-
----
-
-## 🗃️ Estrutura do Banco de Dados (SQLite)
-
-O banco de dados local `posts.db` possui a seguinte estrutura de tabela (`posts`):
-
-| Coluna | Tipo | Descrição |
-| :--- | :--- | :--- |
-| `id` | INTEGER (PK) | Identificador autoincrementado do post. |
-| `tema` | TEXT | Tema/Prompt inicial enviado pelo usuário. |
-| `title` | TEXT | Título curto gerado pela IA. |
-| `carousel_cards` | TEXT | Lista em formato JSON das strings contendo o texto de cada card. |
-| `caption` | TEXT | Legenda gerada com quebras de linha e hashtags. |
-| `status` | TEXT | Status atual do post (`Rascunho`, `Pronto para Imagem`, `Postado`). |
-| `created_at` | TIMESTAMP | Data e hora de criação do registro no banco. |

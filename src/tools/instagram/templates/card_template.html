@@ -9,10 +9,77 @@
             margin: 0;
             padding: 0;
         }
+
+        /* Definição de Variáveis dos Temas */
+        :root {
+            /* Tema Padrão: Azul (Python / Pandas / Polars) */
+            --bg-color: #030712;
+            --card-bg-start: #111827;
+            --card-bg-end: #030712;
+            --card-border: #1f2937;
+            --primary-color: #3b82f6;
+            --glow-color: rgba(59, 130, 246, 0.12);
+            
+            --cover-gradient-start: #a855f7;
+            --cover-gradient-mid: #3b82f6;
+            --cover-gradient-end: #60a5fa;
+            --cover-glow: rgba(168, 85, 247, 0.18);
+            
+            --last-glow: rgba(16, 185, 129, 0.18);
+            --last-cta-color: #10b981;
+            
+            --text-color: #f3f4f6;
+            --text-muted: #cbd5e1;
+            --terminal-bg: #0b0f17;
+            --terminal-border: #1f2937;
+        }
+
+        body.theme-green {
+            /* Tema Verde: FastAPI / Django */
+            --bg-color: #01150f;
+            --card-bg-start: #022c22;
+            --card-bg-end: #01150f;
+            --card-border: #065f46;
+            --primary-color: #10b981;
+            --glow-color: rgba(16, 185, 129, 0.15);
+            
+            --cover-gradient-start: #34d399;
+            --cover-gradient-mid: #10b981;
+            --cover-gradient-end: #059669;
+            --cover-glow: rgba(52, 211, 153, 0.22);
+            
+            --last-glow: rgba(52, 211, 153, 0.22);
+            --last-cta-color: #34d399;
+            
+            --terminal-bg: #022c22;
+            --terminal-border: #065f46;
+        }
+
+        body.theme-black {
+            /* Tema Preto: Git / Assuntos Genéricos */
+            --bg-color: #09090b;
+            --card-bg-start: #18181b;
+            --card-bg-end: #09090b;
+            --card-border: #27272a;
+            --primary-color: #e2e8f0;
+            --glow-color: rgba(148, 163, 184, 0.12);
+            
+            --cover-gradient-start: #cbd5e1;
+            --cover-gradient-mid: #94a3b8;
+            --cover-gradient-end: #4b5563;
+            --cover-glow: rgba(243, 244, 246, 0.15);
+            
+            --last-glow: rgba(148, 163, 184, 0.15);
+            --last-cta-color: #cbd5e1;
+            
+            --terminal-bg: #18181b;
+            --terminal-border: #27272a;
+        }
+
         body {
-            background-color: #030712;
+            background-color: var(--bg-color);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: #f3f4f6;
+            color: var(--text-color);
             -webkit-font-smoothing: antialiased;
         }
         /* Contenedor que agrupa todos os cards para visualização fácil no navegador */
@@ -21,20 +88,20 @@
             flex-direction: column;
             gap: 50px;
             padding: 50px;
-            background-color: #030712;
+            background-color: var(--bg-color);
         }
         /* Dimensões exatas solicitadas: 1080px de largura por 1350px de altura */
         .card {
             width: 1080px;
             height: 1350px;
             position: relative;
-            background: radial-gradient(circle at 50% 30%, #111827 0%, #030712 100%);
+            background: radial-gradient(circle at 50% 30%, var(--card-bg-start) 0%, var(--card-bg-end) 100%);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 95px 80px;
             overflow: hidden;
-            border: 1px solid #1f2937;
+            border: 1px solid var(--card-border);
         }
         
         /* Efeito de brilho neon decorativo no fundo de cada tipo de card */
@@ -45,26 +112,26 @@
             left: -150px;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--glow-color) 0%, transparent 70%);
             filter: blur(80px);
             pointer-events: none;
             z-index: 1;
         }
         
         .card.card-first::before {
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--cover-glow) 0%, transparent 70%);
             top: -100px;
             left: -100px;
         }
-
+ 
         .card.card-last::before {
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--last-glow) 0%, transparent 70%);
             bottom: -100px;
             right: -100px;
             top: auto;
             left: auto;
         }
-
+ 
         .header {
             display: flex;
             justify-content: space-between;
@@ -74,7 +141,7 @@
         .brand {
             font-size: 26px;
             font-weight: 800;
-            color: #3b82f6;
+            color: var(--primary-color);
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
@@ -83,11 +150,11 @@
         .brand-dot {
             width: 10px;
             height: 10px;
-            background-color: #3b82f6;
+            background-color: var(--primary-color);
             border-radius: 50%;
         }
         .brand span {
-            color: #f3f4f6;
+            color: var(--text-color);
         }
         .window-controls {
             display: flex;
@@ -119,26 +186,32 @@
             line-height: 1.25;
             margin-bottom: 30px;
             letter-spacing: -1.5px;
-            background: linear-gradient(135deg, #a855f7 0%, #3b82f6 50%, #60a5fa 100%);
+            background: linear-gradient(135deg, var(--cover-gradient-start) 0%, var(--cover-gradient-mid) 50%, var(--cover-gradient-end) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
+        .card-first .post-title .emoji {
+            -webkit-text-fill-color: initial;
+            background: none;
+            -webkit-background-clip: border-box;
+        }
+        
         .card-first .post-subtitle {
             font-size: 32px;
-            color: #9ca3af;
+            color: var(--text-muted);
             line-height: 1.6;
             font-weight: 500;
         }
         .card-first .post-subtitle strong {
-            color: #f3f4f6;
+            color: var(--text-color);
         }
-
+ 
         /* Card Normal e Último */
         .card-title {
             font-size: 44px;
             font-weight: 800;
-            color: #3b82f6;
+            color: var(--primary-color);
             margin-bottom: 35px;
             line-height: 1.3;
             letter-spacing: -0.8px;
@@ -147,7 +220,7 @@
         .card-text {
             font-size: 28px;
             line-height: 1.65;
-            color: #cbd5e1;
+            color: var(--text-muted);
             font-weight: 400;
         }
         
@@ -156,7 +229,7 @@
         }
         
         .card-text strong {
-            color: #f3f4f6;
+            color: var(--text-color);
             font-weight: 600;
         }
         
@@ -169,17 +242,17 @@
         .card-text li {
             margin-bottom: 12px;
             list-style-type: square;
-            color: #cbd5e1;
+            color: var(--text-muted);
         }
         
         .card-text li strong {
-            color: #3b82f6;
+            color: var(--primary-color);
         }
-
+ 
         /* Bloco de Código Terminal */
         .terminal {
-            background-color: #0b0f17;
-            border: 1px solid #1f2937;
+            background-color: var(--terminal-bg);
+            border: 1px solid var(--terminal-border);
             border-radius: 12px;
             padding: 24px;
             font-family: 'Fira Code', monospace;
@@ -196,7 +269,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1f2937;
+            border-bottom: 1px solid var(--terminal-border);
             padding-bottom: 12px;
             margin-bottom: 16px;
             font-size: 16px;
@@ -216,14 +289,14 @@
             font-size: 14px;
             letter-spacing: 0.5px;
         }
-
+ 
         /* Estilização das classes de código */
         .code-keyword { color: #f472b6; font-weight: bold; }      /* def, import, return */
         .code-builtin { color: #60a5fa; }      /* print, len */
         .code-string { color: #34d399; }       /* strings */
         .code-comment { color: #6b7280; font-style: italic; } /* comentários */
         .code-decorator { color: #fbbf24; }    /* decoradores */
-
+ 
         /* Card de Fechamento (Último Slide) */
         .card-last .cta-container {
             display: flex;
@@ -234,7 +307,7 @@
         .card-last .cta-title {
             font-size: 58px;
             font-weight: 800;
-            color: #10b981;
+            color: var(--last-cta-color);
             line-height: 1.2;
             margin-bottom: 15px;
             letter-spacing: -1px;
@@ -251,20 +324,20 @@
         
         .cta-icon {
             font-size: 36px;
-            color: #10b981;
+            color: var(--last-cta-color);
             width: 50px;
             text-align: center;
         }
         
         .cta-item strong {
-            color: #10b981;
+            color: var(--last-cta-color);
         }
-
+ 
         .footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-top: 1px solid #1f2937;
+            border-top: 1px solid var(--card-border);
             padding-top: 25px;
             z-index: 10;
         }
@@ -279,7 +352,7 @@
         }
         
         .profile .at {
-            color: #3b82f6;
+            color: var(--primary-color);
         }
         
         .slide-indicator {
@@ -291,15 +364,40 @@
             border-radius: 20px;
             letter-spacing: 0.5px;
         }
+
+        /* Código Inline */
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--terminal-bg);
+            border: 1px solid var(--terminal-border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: var(--primary-color);
+            vertical-align: middle;
+        }
+
+        /* Reset para Código em Bloco (Terminal) */
+        pre code {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            font-size: 100% !important;
+            color: inherit !important;
+            vertical-align: baseline !important;
+        }
     </style>
 </head>
-<body>
+<body class="theme-{{ theme|default('blue') }}">
     <div class="carousel-container">
         {% for card in cards %}
         {% set card_index = loop.index %}
         
         {# Define a classe do card com base na posição #}
-        {% if loop.first %}
+        {% if total_cards == 1 %}
+            {% set card_class = "card card-single" %}
+        {% elif loop.first %}
             {% set card_class = "card card-first" %}
         {% elif loop.last %}
             {% set card_class = "card card-last" %}
@@ -312,7 +410,7 @@
             <div class="header">
                 <div class="brand">
                     <div class="brand-dot"></div>
-                    <span>djangiota</span>
+                    <span>brunopythonista</span>
                 </div>
                 <div class="window-controls">
                     <div class="dot red"></div>
@@ -323,9 +421,17 @@
             
             <!-- Conteúdo Principal -->
             <div class="main-content">
-                {% if loop.first %}
+                {% if total_cards == 1 %}
+                    <!-- Slide Único -->
+                    {% if card.card_title %}
+                        <div class="card-title">{{ card.card_title | safe }}</div>
+                    {% endif %}
+                    <div class="card-text">
+                        {{ card.html_content | safe }}
+                    </div>
+                {% elif loop.first %}
                     <!-- Capa -->
-                    <div class="post-title">{{ post_title }}</div>
+                    <div class="post-title">{{ post_title | safe }}</div>
                     <div class="post-subtitle">{{ card.html_content | safe }}</div>
                 {% elif loop.last %}
                     <!-- CTA Final -->
@@ -345,13 +451,13 @@
                         </div>
                         <div class="cta-item">
                             <span class="cta-icon">🔔</span>
-                            <span>Siga <strong>@djangiota</strong> para dominar Python e Backend.</span>
+                            <span>Siga <strong>@brunopythonista</strong> para dominar Python e Backend.</span>
                         </div>
                     </div>
                 {% else %}
                     <!-- Slides de Conteúdo -->
                     {% if card.card_title %}
-                        <div class="card-title">{{ card.card_title }}</div>
+                        <div class="card-title">{{ card.card_title | safe }}</div>
                     {% endif %}
                     
                     <div class="card-text">
@@ -363,11 +469,13 @@
             <!-- Rodapé -->
             <div class="footer">
                 <div class="profile">
-                    <span class="at">@</span>djangiota
+                    <span class="at">@</span>brunopythonista
                 </div>
+                {% if total_cards > 1 %}
                 <div class="slide-indicator">
                     {{ card_index }}/{{ total_cards }}
                 </div>
+                {% endif %}
             </div>
         </div>
         {% endfor %}

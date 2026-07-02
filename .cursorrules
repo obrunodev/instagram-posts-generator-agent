@@ -1,0 +1,77 @@
+# 🤖 Instruções e Diretrizes para IAs de Desenvolvimento (Cursor Rules)
+
+Este repositório é uma suite multi-ferramentas orientada a agentes de inteligência artificial. Siga estritamente as diretrizes abaixo ao interagir, refatorar ou adicionar novos módulos ao projeto.
+
+---
+
+## 🏗️ Arquitetura do Projeto
+
+O projeto adota o padrão de **arquitetura orientada a domínio e ferramentas**, separando o código de infraestrutura do código específico de cada ferramenta:
+
+- **`src/core/`**: Contém configurações globais, banco de dados comum e inicialização de clientes.
+  - [src/core/config.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/core/config.py): Sempre valide configurações usando `config.validate_config()`.
+  - [src/core/database.py](file:///c:/Users/Ariadne/dev/instagram-posts-generator-agent/src/core/database.py): Wrapper de conexão SQLite.
+- **`src/tools/`**: Pasta contendo os agentes de domínio independentes. Cada ferramenta deve ser contida em seu próprio pacote e possuir uma documentação dedicada (`README.md`) e um arquivo de escopo (`escopo_*.md`).
+- **`src/cli.py`**: Ponto de entrada central. Novos comandos CLI devem ser registrados aqui via subparsers.
+- **`data/`**: Pasta para persistência de dados locais, como banco SQLite (`data/posts.db`) e mídias geradas. **Nunca** grave arquivos mutáveis ou de mídia fora do diretório `data/`.
+
+---
+
+## 🛠️ Stack Tecnológica e Ferramental
+
+- **Python**: Versão `>=3.14`.
+- **Gerenciador de Dependências**: Astral `uv`.
+- **Execução**: Sempre execute comandos usando o caminho do módulo:
+  ```bash
+  uv run python -m src.cli [ferramenta] [ação]
+  ```
+- **Gemini SDK**: Utilize **obrigatoriamente** o novo SDK oficial `google-genai` (nunca o legado `google-generativeai`).
+  - Inicialização correta: `client = genai.Client(api_key=config.GEMINI_API_KEY)`.
+  - Modelo padrão: `gemini-2.5-flash`.
+- **Structured Outputs**: Sempre que precisar de outputs formatados em JSON, utilize schemas do **Pydantic** passados em `response_schema` com `response_mime_type="application/json"`.
+
+---
+
+## 📝 Convenções de Código e Boas Práticas
+
+### 1. Codificação e I/O de Terminal
+Para prevenir erros de codificação em terminais Windows (`UnicodeEncodeError`), sempre inclua as seguintes instruções no topo dos arquivos executáveis (como pontos de entrada CLI e scripts principais):
+```python
+import sys
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+```
+
+### 2. Manipulação de Caminhos
+Sempre utilize a biblioteca nativa `pathlib.Path` para manipulação de caminhos em vez de strings brutas ou `os.path`. Garanta a portabilidade multiplataforma.
+
+### 3. Tipagem Estática
+Use anotações de tipo de forma estrita em parâmetros e retornos de funções.
+
+---
+
+## 📸 Regras de Negócio do Módulo Instagram (`src/tools/instagram/`)
+
+- **Cards do Carrossel**: A quantidade de cards deve ser dinâmica entre **5 e 15 cards** (validada no Pydantic até o limite de 20). 
+  - A IA deve avaliar a complexidade do tema: posts simples geram 5-6 cards; guias complexos geram 8-12 cards.
+  - Card 1 é sempre o *Hook* (Capa); o último card é sempre o *CTA* (Chamada para ação).
+- **Legenda**: A legenda deve conter exatamente **5 hashtags** estratégicas ao final do texto.
+- **Design de Cards**: As imagens de saída devem possuir a resolução padrão de **1080x1350px**. A renderização é feita tirando screenshots via Playwright a partir do template compilado com Jinja2.
+- **Salvamento**: O script de design deve salvar no diretório `data/generated/instagram/post_<ID>/`:
+  - Imagens dos cards (`card_1.png` a `card_N.png`).
+  - Arquivo HTML estático compilado (`preview.html`).
+  - Legenda limpa (`legenda.txt`).
+- **Automação Auxiliar**: A legenda deve ser copiada para a área de transferência via `pyperclip` e a pasta do post deve ser aberta automaticamente no Windows usando `os.startfile(output_dir)` (apenas quando rodando em sistema operacional Windows).
+
+---
+
+## 🎥 Regras de Negócio do Módulo YouTube to Obsidian (`src/tools/youtube_to_obsidian/`)
+
+- **Download de Áudio**: Utilize `yt-dlp` configurado para extrair apenas a faixa de áudio no formato `.m4a` compacto (para minimizar largura de banda de upload para a API do Gemini).
+- **Transcrição Multimodal**: O áudio deve ser enviado usando a API de Files (`client.files.upload`). O áudio deve ser deletado do repositório de arquivos do Gemini após o processamento.
+- **Nota no Obsidian Vault**:
+  - Salve a nota gerada em formato Markdown (.md) diretamente no caminho definido pela variável `OBSIDIAN_VAULT_PATH` do `.env`.
+  - O cabeçalho YAML Frontmatter da nota deve conter exatamente as chaves `title`, `date` (no formato `%Y-%m-%d %H:%M:%S`), `source` (URL do YouTube) e a lista de `tags` padrão.
+- **Limpeza**: O arquivo de áudio local temporário baixado no disco **deve ser deletado obrigatoriamente** no bloco `finally` do fluxo de orquestração para evitar o consumo de espaço no disco.

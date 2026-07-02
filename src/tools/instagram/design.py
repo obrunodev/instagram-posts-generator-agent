@@ -7,8 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 from playwright.sync_api import sync_playwright
 import pyperclip
 
-import config
-import db
+from src.core import config, database as db
 
 # Garante a codificação UTF-8 no terminal Windows para evitar UnicodeEncodeError
 if hasattr(sys.stdout, "reconfigure"):
@@ -65,21 +64,32 @@ def highlight_code(code: str) -> str:
 def parse_card_text(text: str) -> dict:
     """
     Parseia o texto cru de um card para HTML:
-    - Extrai blocos de código python, aplicando colorização.
-    - Converte marcações de negrito (**texto**) para <strong>.
+    - Extrai blocos de código (de qualquer linguagem ou genéricos), aplicando colorização se for Python.
+    - Converte marcações de negrito (**texto**) para <strong> e backticks (`texto`) para <code>.
     - Identifica e monta listas não ordenadas (linhas que começam com - ou *).
     """
-    # 1. Detectar bloco de código Python
-    code_match = re.search(r"```python\s*(.*?)\s*```", text, re.DOTALL)
+    # 1. Detectar bloco de código de qualquer tipo (python, bash, git ou vazio)
+    code_match = re.search(r"```(\w*)\s*(.*?)\s*```", text, re.DOTALL)
     code_html = ""
     if code_match:
-        raw_code = code_match.group(1).strip()
-        highlighted = highlight_code(raw_code)
+        lang = code_match.group(1).strip()
+        raw_code = code_match.group(2).strip()
+        
+        # Se for python, aplica realce. Caso contrário, apenas escapa HTML
+        if lang.lower() == "python":
+            highlighted = highlight_code(raw_code)
+            file_name = "main.py"
+            lang_display = "python"
+        else:
+            highlighted = raw_code.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            file_name = "terminal" if lang.lower() in ("bash", "sh", "git") else f"code.{lang}" if lang else "code"
+            lang_display = lang if lang else "text"
+            
         code_html = (
             f'<div class="terminal">'
             f'  <div class="terminal-header">'
-            f'    <span class="terminal-file">main.py</span>'
-            f'    <span class="terminal-lang">python</span>'
+            f'    <span class="terminal-file">{file_name}</span>'
+            f'    <span class="terminal-lang">{lang_display}</span>'
             f'  </div>'
             f'  <pre><code>{highlighted}</code></pre>'
             f'</div>'
@@ -98,9 +108,11 @@ def parse_card_text(text: str) -> dict:
         first_line = lines[0]
         if first_line.startswith("**") and first_line.endswith("**"):
             card_title = first_line.replace("**", "")
+            card_title = re.sub(r"`(.*?)`", r"<code>\1</code>", card_title)
             lines = lines[1:]
         elif len(first_line) < 45 and not first_line.startswith("-") and not first_line.startswith("*"):
             card_title = first_line
+            card_title = re.sub(r"`(.*?)`", r"<code>\1</code>", card_title)
             lines = lines[1:]
 
     in_list = False
@@ -111,6 +123,7 @@ def parse_card_text(text: str) -> dict:
             in_list = True
             item_text = line[2:]
             item_text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", item_text)
+            item_text = re.sub(r"`(.*?)`", r"<code>\1</code>", item_text)
             list_items.append(f"<li>{item_text}</li>")
         else:
             if in_list:
@@ -119,6 +132,7 @@ def parse_card_text(text: str) -> dict:
                 in_list = False
             
             p_text = re.sub(r"\*\*(.*?)\*\*", r"<strong>\1</strong>", line)
+            p_text = re.sub(r"`(.*?)`", r"<code>\1</code>", p_text)
             processed_paragraphs.append(f"<p>{p_text}</p>")
             
     if in_list:
@@ -154,11 +168,11 @@ def gerar_imagens_post(post_id: int) -> bool:
     total_cards = len(processed_cards)
     
     # 3. Prepara o diretório de destino
-    output_dir = config.BASE_DIR / "posts_gerados" / f"post_{post_id}"
+    output_dir = config.BASE_DIR / "data" / "generated" / "instagram" / f"post_{post_id}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # 4. Compila o template com Jinja2 e salva como preview.html no diretório de destino
-    template_dir = config.BASE_DIR / "templates"
+    template_dir = Path(__file__).resolve().parent / "templates"
     env = Environment(loader=FileSystemLoader(str(template_dir)))
     try:
         template = env.get_template("card_template.html")
@@ -166,10 +180,21 @@ def gerar_imagens_post(post_id: int) -> bool:
         print(f"❌ Erro ao carregar o template html: {e}", file=sys.stderr)
         return False
         
+    theme = post.get("theme", "blue")
+    if not theme:
+        theme = "blue"
+
+    # Encontra emojis no título e os envolve em uma tag span.emoji
+    emoji_pattern = re.compile(
+        r'([\u2600-\u27bf]\ufe0f?|[\U0001f000-\U0001f9ff]\ufe0f?|[\U0001fa00-\U0001faff]\ufe0f?)'
+    )
+    post_title_html = emoji_pattern.sub(r'<span class="emoji">\1</span>', post["title"])
+
     html_output = template.render(
-        post_title=post["title"],
+        post_title=post_title_html,
         cards=processed_cards,
-        total_cards=total_cards
+        total_cards=total_cards,
+        theme=theme
     )
     
     preview_html_path = output_dir / "preview.html"
@@ -241,18 +266,9 @@ def gerar_imagens_post(post_id: int) -> bool:
         print(f"❌ Falha ao processar capturas no Playwright: {e}", file=sys.stderr)
         return False
 
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Agente CLI do Instagram @djangiota - Motor de Design (HTML para PNG)"
-    )
-    parser.add_argument(
-        "post_id",
-        type=int,
-        nargs="?",
-        help="ID do post a ser renderizado. Se omitido, renderiza o último post cadastrado."
-    )
-    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Instagram Design Generator CLI")
+    parser.add_argument("post_id", type=int, nargs="?", help="ID do post")
     args = parser.parse_args()
     
     post_id = args.post_id
@@ -264,6 +280,3 @@ def main():
         post_id = posts[0]["id"]
         
     gerar_imagens_post(post_id)
-
-if __name__ == "__main__":
-    main()
